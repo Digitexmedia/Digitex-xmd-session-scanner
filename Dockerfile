@@ -1,5 +1,5 @@
 # Use an official Node.js runtime
-FROM node:18
+FROM node:20
 
 # Create and set working directory
 WORKDIR /app
