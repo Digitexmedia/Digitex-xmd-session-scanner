@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pairing Code</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      background-color: #0a0a1a;
+      color: #00f3ff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Cyberpunk grid background */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+      z-index: -1;
+    }
+
+    /* Scanlines effect */
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 243, 255, 0.03) 0%,
+        rgba(0, 243, 255, 0) 50%,
+        rgba(0, 243, 255, 0.03) 100%
+      );
+      background-size: 100% 4px;
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes scanline {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100%; }
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .box {
+      width: 300px;
+      height: 330px;
+      padding: 20px;
+      background: rgba(10, 10, 20, 0.8);
+      border-radius: 5px;
+      border: 1px solid #00f3ff;
+      box-shadow: 
+        0 0 15px rgba(0, 243, 255, 0.5),
+        inset 0 0 10px rgba(0, 243, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .box::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(0, 243, 255, 0.1) 50%,
+        transparent 100%
+      );
+      animation: shine 4s infinite;
+      z-index: -1;
+    }
+
+    @keyframes shine {
+      0% { transform: rotate(0deg) translate(-30%, -30%); }
+      100% { transform: rotate(360deg) translate(-30%, -30%); }
+    }
+
+    #text {
+      color: #00f3ff;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.7);
+    }
+
+    .centered-text {
+      text-align: center;
+      color: #00f3ff;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.7);
+    }
+
+    h3.centered-text {
+      font-size: 1.5em;
+      margin-bottom: 0.5em;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #00f3ff;
+      padding-bottom: 10px;
+      box-shadow: 0 10px 10px -10px rgba(0, 243, 255, 0.5);
+    }
+
+    h6.centered-text {
+      margin: 0.5em 0;
+      font-size: 0.8em;
+      letter-spacing: 1px;
+    }
+
+    .input-container {
+      display: flex;
+      background: rgba(0, 10, 20, 0.7);
+      border-radius: 5px;
+      border: 1px solid #00f3ff;
+      box-shadow: 
+        0 0 10px rgba(0, 243, 255, 0.3),
+        inset 0 0 5px rgba(0, 243, 255, 0.2);
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: #00f3ff;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    .input-container input::placeholder {
+      color: rgba(0, 243, 255, 0.5);
+    }
+
+    .input-container input:focus {
+      outline: none;
+      background: rgba(0, 243, 255, 0.1);
+    }
+
+    .input-container button {
+      padding: 0 15px;
+      background: linear-gradient(135deg, #00f3ff, #0077ff);
+      border: none;
+      color: #0a0a1a;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .input-container button:hover {
+      background: linear-gradient(135deg, #00c3ff, #0055ff);
+    }
+
+    #waiting-message {
+      color: #00f3ff;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.7);
+      font-style: italic;
+      display: none;
+    }
+
+    #pair {
+      color: #00f3ff;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.7);
+    }
+
+    .fa-user {
+      color: #00f3ff;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+      font-size: 2em;
+      margin-bottom: 15px;
+    }
+</style>  
+ 
+</head>
+<body>
+  
+
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p>
+            <h3 class="centered-text">PEACE MAKER SESSION</h3>
+            <br>
+            <h6 class="centered-text">Enter your phone number below to generate a pairing code.</h6>
+            <h6 class="centered-text">regards Bera</h6>
+            <div class="input-container">
+                <input placeholder="Eg 2547*******" type="number" id="number" placeholder="Enter your phone number" name="">
+                <button id="submit">Enter</button>
+            </div>
+            <a id="waiting-message" class="centered-text" style="display: none;">Getting Code...</a>
+            <br>
+            <br>
+            <main id="pair"></main>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:blue;font-weight:bold";
+      obj.size = "5";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:white;font-weight:bold";
+        obj.size = "5";
+      }, 500);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Invalid Number</a><br><br>';
+      } else {
+        const Wasi_Tech = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = Wasi_Tech.split('');
+        cc.map(a => {
+          bbc += a;
+          if (bbc.length == 3) {
+            bb += " " + a;
+          } else if (bbc.length == 8) {
+            bb += " " + a;
+          } else {
+            bb += a;
+          }
+        });
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
+        let { data } = await axios(`/code?number=${Wasi_Tech}`);
+        let code = data.code || "Service Unavailable";
+        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">' + code + '</span></font><br><br><br>';
+      }
+    });
+
+    function createMatrix() {
+      const matrixContainer = document.querySelector('.matrix');
+      const columns = Math.floor(window.innerWidth / 20);
+      for (let i = 0; i < columns; i++) {
+        const column = document.createElement('div');
+        column.style.left = `${i * 20}px`;
+        column.style.animationDuration = `${Math.random() * 5 + 2}s`;
+        matrixContainer.appendChild(column);
+
+        for (let j = 0; j < 30; j++) {
+          const char = document.createElement('span');
+          char.innerText = String.fromCharCode(0x30A0 + Math.random() * 96);
+          column.appendChild(char);
+        }
+      }
+    }
+
+    createMatrix();
+  </script>
+</body>
+                                  </html>
+  
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1737874207490861"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLOUD AI QR SCANER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&amp;display=swap" rel="stylesheet">
+    <title>QR</title>
+    <style>
+        .bg {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: 400% 400%;
+            animation: AnimateBG 25s ease infinite;
+        }
+
+        @keyframes AnimateBG {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Outfit";
+            background: linear-gradient(-45deg, #4a90e2, #3ac569, #9b59b6, #e74c3c);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        jsl.code {
+            overflow: hidden;
+            background: linear-gradient(-45deg, #f1c40f, #3498db, #2ecc71, #e74c3c);
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            height: 110vh;
+            margin: 0px;
+
+        }
+
+        p.legend {
+            color: #fff;
+            font-size: 1em;
+            font-weight: 400;
+            padding: 0em 1.1em;
+            margin-top: 0.1em;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        :root {
+            --main-color: hsl(212, 45%, 89%);
+            --principalText-color: hsl(218, 44%, 22%);
+            --secondText-color: hsl(220, 15%, 55%);
+        }
+
+        #content {
+            display: flex;
+            flex-direction: column;
+            width: 22rem;
+            text-align: center;
+            background-color: #000000;
+            padding: 1rem;
+            border-radius: 14px;
+        }
+
+        #QR-content img {
+            border-radius: 10px;
+            width: 20rem;
+        }
+
+        #title-container {
+            padding: 1rem 1rem 0 1rem;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        #description-container {
+            padding: 0 2.5rem 0 2.5rem;
+            color: #fff;
+            margin-bottom: 2rem;
+        }
+
+        #p-legend {
+            font-size: 1em;
+            font-weight: 400;
+            padding: 0em 1.1em;
+            margin-top: 0.1em;
+        }
+
+        .reload-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db; /* Blue color */
+            color: #fff; /* White text color */
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .reload-button:hover {
+            background-color: #2980b9; /* Darker blue color on hover */
+        }
+    </style>
+    <script>
+        var timeleft = 30;
+        var downloadTimer = setInterval(function () {
+            if (timeleft <= 0) {
+                clearInterval(downloadTimer);
+                document.getElementById("progressBar").remove();
+                document.getElementById("main").innerHTML = "QR Expired! Please reload";
+                document.getElementById("legend").innerHTML = ""
+            }
+            document.getElementById("progressBar").value = 30 - timeleft;
+            timeleft -= 1;
+        }, 1000);
+    </script>
+</head>
+<body>
+<div class="bg">
+    <div id="content">
+        <div id="QR-content">
+            <img id="qr-image" src="/server" alt="QR CODE">
+        </div>
+        <div id="title-container">
+            <h2 id="main">CLOUD AI QR</h2>
+            <p class="legend" id="legend">Scan The QR Code</p>
+        </div>
+        <div id="description-container">
+            <p id="semi" class="legend"></p>
+            <progress value="0" max="30" id="progressBar"></progress>
+        </div>
+        <a href="javascript:history.go(0)" class="reload-button">Reload Page</a>
+    </div>
+</div>
+</body>
+</html>
