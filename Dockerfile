@@ -1,21 +1,19 @@
-FROM node:lts-buster
+# Use an official Node.js runtime
+FROM node:18
 
-RUN apt-get update && \
-  apt-get install -y \
-  ffmpeg \
-  imagemagick \
-  webp && \
-  apt-get upgrade -y && \
-  rm -rf /var/lib/apt/lists/*
-  
-WORKDIR /usr/src/app
+# Create and set working directory
+WORKDIR /app
 
-COPY package.json .
+# Copy package.json and install dependencies
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn install
 
-RUN npm install && npm install -g qrcode-terminal pm2
-
+# Copy app source
 COPY . .
 
-EXPOSE 5000
+# Expose your server port (change 3000 if you're using another)
+EXPOSE 3000
 
-CMD ["npm", "start"]
+# Start the app
+CMD ["yarn", "start"]
