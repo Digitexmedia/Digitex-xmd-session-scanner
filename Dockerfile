@@ -5,8 +5,7 @@ FROM node:18
 WORKDIR /app
 
 # Copy package.json and package-lock.json (generate package-lock.json locally if not already present)
-COPY package.json ./
-COPY package-lock.json ./
+COPY package.json./
 RUN npm install
 
 # Copy app source
