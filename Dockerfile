@@ -4,14 +4,14 @@ FROM node:18
 # Create and set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (generate package-lock.json locally if not already present)
-COPY package.json./
+# Copy package.json and install dependencies
+COPY package.json ./
 RUN npm install
 
 # Copy app source
 COPY . .
 
-# Expose your server port (change 3000 if you're using another)
+# Expose your server port (change 3000 if needed)
 EXPOSE 3000
 
 # Start the app
