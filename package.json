@@ -1,12 +1,10 @@
 {
   "name": "web-pair",
   "version": "0.0.1",
-  "description": "A multi functional WhatsApp bot Web paircode.",
+  "description": "A multi-functional WhatsApp bot Web paircode.",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name vajira-md",
-    "stop": "pm2 stop vajira-md",
-    "restart": "pm2 restart vajira-md"
+    "start": "node index.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "github:seiren-primrose/PL-Baileys",
