@@ -1,18 +1,21 @@
-# Use an official Node.js runtime
-FROM node:20
+FROM node:lts-buster
 
-# Create and set working directory
-WORKDIR /app
+RUN apt-get update && \
+  apt-get install -y \
+  ffmpeg \
+  imagemagick \
+  webp && \
+  apt-get upgrade -y && \
+  rm -rf /var/lib/apt/lists/*
+  
+WORKDIR /usr/src/app
 
-# Copy package.json and install dependencies
-COPY package.json ./
-RUN npm install
+COPY package.json .
 
-# Copy app source
+RUN npm install && npm install -g qrcode-terminal pm2
+
 COPY . .
 
-# Expose your server port (change 3000 if needed)
-EXPOSE 3000
+EXPOSE 5000
 
-# Start the app
 CMD ["npm", "start"]
