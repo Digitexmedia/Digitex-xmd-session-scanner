@@ -4,10 +4,10 @@ FROM node:18
 # Create and set working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package.json and package-lock.json (generate package-lock.json locally if not already present)
 COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install
+COPY package-lock.json ./
+RUN npm install
 
 # Copy app source
 COPY . .
@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 3000
 
 # Start the app
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
